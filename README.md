@@ -3,7 +3,7 @@
 
 ## Project Description
 
-+ Performs Ridge regression for linear models (y=Xβ+ɛ, ɛ~N(0,$\ σ^2$)) with 10-fold cross validation
++ Performs Ridge regression for linear models (y=Xβ+ɛ, ɛ~N(0,$\sigma^2$)) with 10-fold cross validation
 	Compared to normal equation of solving linear models
 		$\hat{\beta}=(X^T X)^{-1} X^T y$
 	Ridge regression adds L2 penalty term to ensure invertibility
