@@ -1,30 +1,9 @@
 %================================================
 % Ridge regression with 10-fold cross validation (without parallelization)
-% Input:
-%   X: the Nxp input matrix with N observations on p coefficients
-%   y: the N*1 observation matrix
-%   lambdas: the list of lambdas for regularization
-%   opts: (Optional) 1x1 struct including solver options
-%         standardize: to standardize the input X or not, enter 0 or 1,
-%           default is 0
-%         train_ratio: proportion of data used for training, default 0.8
-%  OUTPUT:
-%   b: coefficient estimates
-%   LRT_result: results from likelihood-ratio test
-%       includes the i-th coefficient (except the constant term), 
-%                   reject null hypothesis or not, 
-%                   p-value
-%                   test statistic value (chi-squared test)
-%   mse: the mse of the model tested on the test set
-%   r_sq: r-square, goodness of fit
-%================================================
-function [b,LRT_result,mse,r_sq] = ridge_nopar(X,y,lambdas,stdz,train_ratio)
+
+function [b,LRT_result,mse,r_sq] = ridge_nopar(X,y,lambdas,train_ratio)
     
     
-    % standardize the columns of input matrix X if requested
-    if stdz == 1
-        X = normalize(X);
-    end
 
     [N,p]=size(X);
 
