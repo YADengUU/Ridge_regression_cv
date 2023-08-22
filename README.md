@@ -3,7 +3,7 @@
 
 ## Project Description
 
-+ Performs Ridge regression for linear models (y=Xβ+ɛ, ɛ~N(0,σ^2)) with 10-fold cross validation
++ Performs Ridge regression for linear models (y=Xβ+ɛ, ɛ~N(0, σ²)) with 10-fold cross validation
 	Compared to normal equation of solving linear models
 		$\hat{\beta}=(X^T X)^{-1} X^T y$
 	Ridge regression adds L2 penalty term to ensure invertibility
@@ -26,7 +26,7 @@ The current version does not support non-numerical, i.e., qualitative entries.
 The scripts can be downloaded to run in MATLAB (version 2022b or 2023a). 
 
 Or run the command line:
-```
+```docker
 docker run -it --rm --shm-size=512M ridge_regression_project
 ```
 which prompts user to enter the MATLAB account and password before being able to run the function ridge_regression(X, y) or ridge_regression(X, y,lambdas,train_ratio) if customized \lambda’s and training ratio is desired.
