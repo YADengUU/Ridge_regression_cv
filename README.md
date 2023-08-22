@@ -15,7 +15,7 @@
 + In addition to the coefficient estimates βs, the outputs of ridge_regression has the MSE of the fitted model on test set as well as r^2 indicating the goodness of fit, and results from likelihood ratio test. One may check the p-value and significance by viewing the results of the likelihood ratio test. For example, by running 
  `[b,LRT_result,mse,r_sq] = ridge_regression(X,y)`
 
-+ user can view the coefficient estimates in b, the MSE and r^2 in mse and r_sq. LRT_results is a matrix with rows as [`coefficient, reject_null, p_value, test_statistic`] for each coefficient except the constant term.
++ user can view the coefficient estimates in b, the MSE and r^2 in mse and r_sq. LRT_results is a matrix with rows as `[coefficient, reject_null, p_value, test_statistic]` for each coefficient except the constant term.
 
 ## Caution
 
