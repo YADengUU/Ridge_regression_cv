@@ -1,5 +1,5 @@
 %================================================
-% Ridge regression with 10-fold cross validation
+% Initiation of ridge regression
 % Input:
 %   X: the Nxp input matrix with N observations on p coefficients
 %   y: the N*1 observation matrix
@@ -10,19 +10,32 @@
 %         train_ratio: proportion of data used for training, default 0.8
 %  OUTPUT:
 %   b: coefficient estimates
-%   pval: p-value of the covariates
-%   cv_results: the mse from cv of each lambda
-%   mse: mse of the model
+%   LRT_result: results from likelihood-ratio test
+%       includes the i-th coefficient (except the constant term), 
+%                   reject null hypothesis or not, 
+%                   p-value
+%                   test statistic value (chi-squared test)
+%   mse: the mse of the model tested on the test set
 %   r_sq: r-square, goodness of fit
-%   best_lambda: the ultimate ridge tuning parameter chosen
-
 %================================================
-function [b,cv_results,mse,r_sq,best_lambda] = ridge_regression(X,y,lambdas,opts)
-    
+function [b,LRT_result,mse,r_sq] = ridge_regression(X,y,lambdas,opts)
 
-    % set solver options
     if nargin < 3              
         error(message('Not enough inputs'));      
+    end
+
+    % non-numerical entries are not supported yet
+    if ~isnumeric(X)||~isnumeric(y)
+        error(message('Data entries must be numeric'));
+    end
+    if ~isnumeric(lambdas)
+        error(message('Ridge tuning parameter lambda must be numeric'));
+    end
+
+    [nx,p]=size(X);
+    ny=length(y);
+    if nx~=ny
+        error(message('Sample sizes of input and output matrix do not match'));
     end
 
     if (nargin<4)||isempty(opts)||~isfield(opts,'standardize')
@@ -40,81 +53,19 @@ function [b,cv_results,mse,r_sq,best_lambda] = ridge_regression(X,y,lambdas,opts
             train_ratio=opts.train_ratio;
         end
     end
-    
+
     % remove missing values in X and y
     nas_ind = (isnan(y) | any(isnan(X),2));
     if any(nas_ind)
         X = X(~nas_ind,:);
         y = y(~nas_ind);
     end
+    fprintf('Removed %d samples due to missing values\n',sum(nas_ind));
 
-    [N,p]=size(X);
-   
-    % standardize the columns of input matrix X if requested
-    if stdz == 1
-        X = normalize(X);
+    if p<999
+        [b,LRT_result,mse,r_sq] = ridge_nopar(X,y,lambdas,stdz,train_ratio);
+    else
+        [b,LRT_result,mse,r_sq] = ridge_parallel(X,y,lambdas,stdz,train_ratio);
     end
-
-
-    % append a column of ones to X, make it a design matrix
-    X = [ones(N,1),X];
-
-    % split data into training and test set
-    partition = cvpartition(N,'HoldOut',1-train_ratio);
-    train_inds = training(partition);
-    X_train = X(train_inds,:);
-    y_train = y(train_inds);
-    test_inds = test(partition);
-    X_test = X(test_inds,:);
-    y_test = y(test_inds);
-
-    % compute cross-validation of the lambdas in parallel
-    cv_results = zeros(length(lambdas),2);
-
-    for i = 1:length(lambdas)
-        lambda = lambdas(i);
-        [cv_err]= cross_validation(X_train,y_train,lambda);
-        cv_results(i,:)=[lambda,cv_err];
-    end
-
-    % choose the lambda that gives smallest cross-validation error
-    [err_min,ind_min] = min(cv_results(:,2));
-    best_lambda = cv_results(ind_min,1);
-
-    % fit the model with all training data with this lambda
-    I = eye(p+1);
-    b = (transpose(X_train)*X_train+best_lambda*I)\transpose(X_train)*y_train;
-
-    b_ols=(transpose(X_train)*X_train)\transpose(X_train)*y_train;
-
-    % prediction using the resulting model on test set
-    y_pred = X_test*b;
-    residuals = y_pred-y_test;
-    mse = mean(residuals.^2);
-
-    y_ols = X_test*b_ols;
-    mse_ols=mean((y_ols-y_test).^2);
-
-    % goodness-of-fit
-    r_sq=1-(sum(residuals.^2)/sum((y_test-mean(y_test)).^2));
-    r_sq_ols=1-(sum((y_ols-y_test).^2)/sum((y_test-mean(y_test)).^2));
-
-    % p-value using LRT
-    %  log-likelihood of full model
-    %logL_full = compute_loglikelihood(y_pred,y_test);
-
-    % fit reduced model
-    LRT_result = zeros(p,4);
-    for i = 2:(p+1)
-        X_rm_train = X_train(:,[1:i-1,i+1:end]);
-        X_rm_test = X_test(:,[1:i-1,i+1:end]);
-        I = eye(p);
-        b_rm = (transpose(X_rm_train)*X_rm_train+best_lambda*I)\transpose(X_rm_train)*y_train;
-        y_rm_pred=X_rm_test*b_rm;
-        [h,pval,stat] = lratiotest(logL_full,compute_loglikelihood(y_rm_pred,y_test),1);
-        LRT_result(i-1,:)=[i-1,h,pval,stat];
-    end
-    
 
 end
-
