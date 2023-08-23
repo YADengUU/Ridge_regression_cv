@@ -3,7 +3,7 @@
 % Input:
 %   X: the Nxp input matrix with N observations on p coefficients
 %   y: the N*1 observation matrix
-%   lambdas: the list of lambdas for regularization, e.g. exp(-8:5)
+%   lambdas: the list of lambdas for regularization, e.g. exp(-8:6)
 %   train_ratio: proportion of data used for training, default 0.8
 %
 %  OUTPUT:
@@ -64,4 +64,4 @@ function [b,LRT_result,mse,r_sq] = ridge_regression(X,y,lambdas,train_ratio)
         [b,LRT_result,mse,r_sq] = ridge_parallel(X,y,lambdas,train_ratio);
     end
 
-end
+end 
