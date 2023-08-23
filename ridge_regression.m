@@ -48,6 +48,8 @@ function [b,LRT_result,mse,r_sq] = ridge_regression(X,y,lambdas,train_ratio)
         error('Training set should be at least 70% of the whole data');
     elseif train_ratio>=1
         error('Training set cannot be greater than 100% of the whole data');
+    elseif ~isnumeric(train_ratio)
+        error('Training ratio must be numeric');
     end
 
     % remove missing values in X and y
@@ -64,4 +66,4 @@ function [b,LRT_result,mse,r_sq] = ridge_regression(X,y,lambdas,train_ratio)
         [b,LRT_result,mse,r_sq] = ridge_parallel(X,y,lambdas,train_ratio);
     end
 
-end 
+end
