@@ -19,39 +19,41 @@
 function [b,LRT_result,mse,r_sq] = ridge_regression(X,y,lambdas,train_ratio)
 
     if nargin < 2              
-        error('Not enough inputs');      
+        error('MyError:InadequateInput','Not enough inputs');      
     end
 
     % non-numerical entries are not supported yet
     if ~isnumeric(X)||~isnumeric(y)
-        error('Data entries must be numeric');
+        error('MyError:NonnumericalInput','Data entries must be numeric');
     end
 
     [nx,p]=size(X);
     ny=length(y);
     if nx~=ny
-        error('Sample sizes of input and output matrix do not match');
+        error('MyError:UnmatchingSize','Sample sizes of input and output matrix do not match');
     end
     
     if ~exist('lambdas','var')
         lambdas=exp(-8:6);
     end
     if ~isnumeric(lambdas)
-        error('Ridge tuning parameter lambda must be numeric');
+        error('MyError:NonnumericalLambda','Ridge tuning parameter lambda must be numeric');
     end
 
     if ~exist('train_ratio','var')
         train_ratio=0.8;
     end
-
-    if train_ratio<0.7
-        error('Training set should be at least 70% of the whole data');
-    elseif train_ratio>=1
-        error('Training set cannot be greater than 100% of the whole data');
-    elseif ~isnumeric(train_ratio)
-        error('Training ratio must be numeric');
+    
+    if ~isnumeric(train_ratio)
+        error('MyError:NonnumericalTraining','Training ratio must be numeric');
+    else
+        if train_ratio<0.7
+            error('MyError:SmallTraining','Training set should be at least 70 percent of the whole data');
+        elseif train_ratio>=1
+            error('MyError:HugeTraining','Training set cannot be greater than 100 percent of the whole data');
+        end
     end
-
+    
     % remove missing values in X and y
     nas_ind = (isnan(y) | any(isnan(X),2));
     if any(nas_ind)
